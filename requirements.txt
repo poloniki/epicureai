@@ -1,0 +1,6 @@
+roboflow
+ultralytics
+ipykernel
+pandas
+numpy
+comet_ml
