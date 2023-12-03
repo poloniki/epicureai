@@ -50,7 +50,6 @@ def train_model(epochs: int = 10, img_size: int = 512):
             epochs=epochs,
             imgsz=img_size,
             patience=20,
-            device="mps",
         )
 
     # Save the trained model weights to Comet ML
