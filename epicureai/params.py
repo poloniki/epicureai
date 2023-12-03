@@ -1,2 +1,4 @@
+import os
+
 NUM_EPOCHS = 1
-DEVICE = "mps"
+LOCAL_DATA_PATH = os.path.expanduser("~/.epicureai_data")
