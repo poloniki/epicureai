@@ -3,17 +3,13 @@ from epicureai.params import *
 import os
 import comet_ml
 from comet_ml import API
-import torch
-
-# Set device to GPU
-torch.cuda.set_device(0)
 
 
 # Function to train the model
 def train_model(epochs: int = 10, img_size: int = 512):
     # Initialize Comet ML API connection
     api = API()
-    comet_ml.init()
+    # comet_ml.init()
 
     # Try to use pretrained weights if available
     try:
