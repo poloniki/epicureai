@@ -42,6 +42,7 @@ def train_model(epochs: int = 10, img_size: int = 512):
         imgsz=img_size,
         device="mps",
         patience=20,
+        device="gpu",
     )
 
     # Saving latest model weights to the COMET ML online
