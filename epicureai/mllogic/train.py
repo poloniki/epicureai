@@ -4,14 +4,6 @@ import os
 import comet_ml
 from comet_ml import API
 
-# Set up workspace, model name, and project variables
-workspace = "poloniki"
-model_name = "yolo-model"
-project = "epicure"
-
-# Set an environment variable for the model name
-os.environ["COMET_MODEL_NAME"] = model_name
-
 
 # Function to train the model
 def train_model(epochs: int = 10, img_size: int = 512):
@@ -22,9 +14,14 @@ def train_model(epochs: int = 10, img_size: int = 512):
     # Try to use pretrained weights if available
     try:
         # Fetching the model from Comet ML
-        models = api.get_model(workspace=workspace, model_name=model_name)
-        model_versions = models.find_versions()
-        last_version = model_versions[0]
+        models = api.get_model(
+            workspace=COMET_WORKSPACE_NAME,
+            model_name=COMET_MODEL_NAME,
+        )
+
+        # Get production model weights
+        model_versions = models.find_versions(status="Production")
+        production_weights = model_versions[0]
 
         # Preparing local path for weights
         weights_path = os.path.join(LOCAL_DATA_PATH, "weights")
@@ -32,7 +29,7 @@ def train_model(epochs: int = 10, img_size: int = 512):
 
         # Downloading the weights
         models.download(
-            version=last_version,
+            version=production_weights,
             output_folder=weights_path,
             expand=True,
         )
@@ -57,16 +54,34 @@ def train_model(epochs: int = 10, img_size: int = 512):
         print("❗️ Initialized new weights from scratch")
 
     # Save the trained model weights to Comet ML
-    experiments = api.get(workspace=workspace, project_name=project)
+    experiments = api.get(
+        workspace=COMET_WORKSPACE_NAME, project_name=COMET_PROJECT_NAME
+    )
 
     # Registering the latest experiment and model
+    current_experiment = experiments[-1]._name
     experiment = api.get(
-        workspace=workspace,
-        project_name=project,
-        experiment=experiments[-1]._name,
+        workspace=COMET_WORKSPACE_NAME,
+        project_name=COMET_PROJECT_NAME,
+        experiment=current_experiment,
     )
-    experiment.register_model(model_name)
-    print("✅ Saved weights of this run to Comet ML")
+
+    # Sort list of experiments by one of the metrics to find best one
+    experiments.sort(
+        key=lambda experiment: float(
+            experiment.get_metrics_summary("metrics/mAP50(B)")["valueMax"]
+        )
+    )
+    # get best experiment
+    best_experiment_so_far = experiments[-1]._name
+
+    # If current one is the best than move this model to production
+    if current_experiment == best_experiment_so_far:
+        experiment.register_model(COMET_MODEL_NAME, status="Production")
+        print("✅ Registered current model as Production")
+    else:
+        experiment.register_model(COMET_MODEL_NAME)
+        print("🖌️ Registered current model as history")
 
 
 # Main execution
