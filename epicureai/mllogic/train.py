@@ -42,7 +42,6 @@ def train_model(epochs: int = 10, img_size: int = 512):
         data=os.path.join(LOCAL_DATA_PATH, "data.yaml"),
         epochs=epochs,
         imgsz=img_size,
-        device="mps",
         patience=20,
     )
 
