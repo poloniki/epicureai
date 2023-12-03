@@ -9,7 +9,7 @@ from comet_ml import API
 def train_model(epochs: int = 10, img_size: int = 512):
     # Initialize Comet ML API connection
     api = API()
-    # comet_ml.init()
+    comet_ml.init()
 
     # Try to use pretrained weights if available
     try:
