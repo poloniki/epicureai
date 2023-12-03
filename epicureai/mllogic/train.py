@@ -21,7 +21,7 @@ def train_model(epochs: int = 10, img_size: int = 512):
 
         # Get production model weights
         model_versions = models.find_versions(status="Production")
-        production_weights = model_versions[0]
+        latest_production_weights = model_versions[0]
 
         # Preparing local path for weights
         weights_path = os.path.join(LOCAL_DATA_PATH, "weights")
@@ -29,7 +29,7 @@ def train_model(epochs: int = 10, img_size: int = 512):
 
         # Downloading the weights
         models.download(
-            version=production_weights,
+            version=latest_production_weights,
             output_folder=weights_path,
             expand=True,
         )
@@ -50,8 +50,8 @@ def train_model(epochs: int = 10, img_size: int = 512):
             epochs=epochs,
             imgsz=img_size,
             patience=20,
+            device="mps",
         )
-        print("❗️ Initialized new weights from scratch")
 
     # Save the trained model weights to Comet ML
     experiments = api.get(
@@ -68,10 +68,14 @@ def train_model(epochs: int = 10, img_size: int = 512):
 
     # Sort list of experiments by one of the metrics to find best one
     experiments.sort(
-        key=lambda experiment: float(
-            experiment.get_metrics_summary("metrics/mAP50(B)")["valueMax"]
+        key=lambda each_experiment: float(
+            each_experiment.get_metrics_summary("metrics/mAP50(B)")["valueMax"]
         )
+        # If some experiment got stopped without any metric we want to skip it
+        if isinstance(each_experiment.get_metrics_summary("metrics/mAP50(B)"), dict)
+        else 0
     )
+
     # get best experiment
     best_experiment_so_far = experiments[-1]._name
 
