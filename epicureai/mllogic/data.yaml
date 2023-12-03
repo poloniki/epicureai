@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 16
+names: ['avocado', 'banana', 'carrot', 'cheese', 'courgette', 'egg', 'milk_almond', 'oat', 'olive_oil', 'pasta_fusili_lentil', 'potato', 'quinoa', 'rice', 'salmon', 'sweet_potato', 'tomato']
+
+roboflow:
+  workspace: wagon
+  project: epicureai
+  version: 6
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/wagon/epicureai/dataset/6

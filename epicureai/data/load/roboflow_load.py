@@ -1,26 +1,11 @@
-import requests
-import zipfile
-import os
+from roboflow import Roboflow
 
 
 def load_data_from_roboflow():
-    url = "https://app.roboflow.com/ds/4d4aY2rAVy?key=W1qncyfr9X"
-    zipfile_path = "dataset.zip"
+    rf = Roboflow(api_key="Y3lBMUN1R4cIQVX0YLpO")
+    project = rf.workspace("wagon").project("epicureai")
+    dataset = project.version(12).download("yolov8")
 
-    response = requests.get(url).content
 
-    with open(zipfile_path, "wb") as f:
-        f.write(response)
-
-    # Destination directory using the home directory
-    destination_directory = os.path.join(
-        os.path.expanduser("~"), ".lewagon", "data", "roboflow"
-    )
-
-    # Check if the destination directory exists, if not, create it
-    if not os.path.exists(destination_directory):
-        os.makedirs(destination_directory, exist_ok=True)
-
-    # Open and extract the ZIP file
-    with zipfile.ZipFile(zipfile_path, "r") as zip_ref:
-        zip_ref.extractall(destination_directory)
+if __name__ == "__main__":
+    load_data_from_roboflow()

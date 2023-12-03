@@ -1,2 +1,2 @@
 NUM_EPOCHS = 1
-DIVICE = "mps"
+DEVICE = "mps"
