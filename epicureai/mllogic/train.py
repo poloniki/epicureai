@@ -3,7 +3,6 @@ from epicureai.params import *
 import os
 import comet_ml
 from comet_ml import API
-import torch
 
 
 workspace = "poloniki"
@@ -36,7 +35,6 @@ def train_model(epochs: int = 10, img_size: int = 512):
         print(f"❌ Could not loaded weights: {error}")
         model = YOLO("yolov8n.pt")
         print("❗️ Initialized new weights from scratch")
-    torch.cuda.set_device(0)
     # Train the model
     model.train(
         data=os.path.join(LOCAL_DATA_PATH, "data.yaml"),
